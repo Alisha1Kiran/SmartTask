@@ -1,32 +1,32 @@
-name: Build & Deploy Angular App to Firebase
+name: Deploy to Firebase Hosting
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
 
-    - name: Use Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: 20
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
 
-    - name: Install Dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Build Angular App
-      run: npm run build
+      - name: Build Angular App
+        run: npm run build
 
-    - name: Deploy to Firebase Hosting
-  uses: FirebaseExtended/action-hosting-deploy@v0
-  with:
-    repoToken: '${{ secrets.GITHUB_TOKEN }}'
-    firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-    projectId: smarttask-162a0
-    channelId: live
+      - name: Deploy to Firebase Hosting
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
+          channelId: live
+          projectId: smarttask-162a0
