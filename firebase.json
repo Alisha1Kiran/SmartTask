@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/smarttask",
+    "public": "dist/smarttask/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
