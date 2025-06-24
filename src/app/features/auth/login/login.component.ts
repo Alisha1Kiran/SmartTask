@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators} from '@angular/forms';
 import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
+import { Router } from '@angular/router'
 
 @Component({
   selector: 'app-login',
@@ -12,6 +13,7 @@ import { Auth, signInWithEmailAndPassword } from '@angular/fire/auth';
 export class LoginComponent {
   private fb = inject(FormBuilder);
   auth = inject(Auth);
+  router = inject(Router);
 
 
   loginForm: FormGroup = this.fb.group({
@@ -28,6 +30,7 @@ export class LoginComponent {
       signInWithEmailAndPassword(this.auth, email, password)
       .then((userCredential) => {
         console.log("User logged in : ", userCredential.user);
+        this.router.navigate(['/dashboard'])
       })
       .catch((error) => {
         console.log("Login Error : ", error.message);
