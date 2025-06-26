@@ -1,0 +1,32 @@
+.signup-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+  }
+  
+  .signup-form {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 400px;
+    padding: 24px;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    gap: 16px; /* vertical space between fields */
+  }
+  
+  mat-form-field {
+    width: 100%;
+  }
+  
+  button[type='submit'] {
+    width: 100%;
+  }
+  
+  .error-message {
+    color: red;
+    text-align: center;
+  }
+  

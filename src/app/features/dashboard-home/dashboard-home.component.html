@@ -1,0 +1,14 @@
+<div class="dashboard-grid">
+  <mat-card class="summary-card">Pending: {{ pendingCount() }}</mat-card>
+  <mat-card class="summary-card">Completed: {{ completedCount() }}</mat-card>
+  <mat-card class="summary-card">Overdue: {{ overdueCount() }}</mat-card>
+</div>
+
+<h3>Today's Tasks</h3>
+<mat-list>
+    @for (task of todaysTasks(); track task.id) {
+  <mat-list-item>
+    {{ task.title }} - {{ task.dueDate | date : "shortDate" }}
+  </mat-list-item>
+}
+</mat-list>
