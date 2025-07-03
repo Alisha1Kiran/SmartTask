@@ -1,1 +1,66 @@
-<p>tasks works!</p>
+<div class="task-toolbar">
+  <div class="filter-group">
+    <!-- Filter by status -->
+  <mat-form-field appearance="outline">
+    <mat-label>Status</mat-label>
+    <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilter()">
+      <mat-option value="all">All</mat-option>
+      <mat-option value="pending">Pending</mat-option>
+      <mat-option value="completed">Completed</mat-option>
+      <mat-option value="overdue">Overdue</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Assignee</mat-label>
+    <mat-select
+      [(ngModel)]="selectedAssignee"
+      (selectionChange)="applyFilter()"
+    >
+      <mat-option value="all">All</mat-option>
+  
+      @for (user of allUsers; track user.uid) {
+        <mat-option [value]="user.uid">
+          {{ user.name || user.email }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+  </div>
+
+  <!-- Add Task button -->
+  @if (userProfile()?.role === 'admin'){
+  <button mat-raised-button color="primary" (click)="openTaskForm()">
+    + Add Task
+  </button>
+  }
+</div>
+
+<!-- Task List -->
+<div class="task-list">
+  @for (task of filteredTasks(); track task.id) {
+  <mat-card class="task-card">
+    <mat-card-title>{{ task.title }}</mat-card-title>
+    <mat-card-subtitle
+      >Due: {{ task.dueDate | date : "shortDate" }}</mat-card-subtitle
+    >
+    <mat-card-content
+      >Status: {{ task.status }}<br />
+      Assigned to: {{ getAssigneeName(task.assignedTo) }}</mat-card-content
+    >
+
+    @if (userProfile()?.role === 'admin') {
+    <mat-card-footer>
+      <mat-card-actions>
+        <button mat-raised-button color="primary" (click)="editTask(task)">
+          Edit
+        </button>
+        <button mat-raised-button color="warm" (click)="deleteTask(task.id!)">
+          Delete
+        </button>
+      </mat-card-actions>
+    </mat-card-footer>
+    }
+  </mat-card>
+  }
+</div>
