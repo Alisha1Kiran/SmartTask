@@ -12,6 +12,7 @@ import { Task } from '../../models/task.model';
 import { UserProfile } from '../../models/user.model';
 import { TaskFormComponent } from '../taskHelperComponents/taskform/taskform.component';
 import { convertTimestampToDate } from '../../utils/date-utils';
+import { NotificationService } from '../../services/notification/notification.service';
 
 @Component({
   selector: 'app-tasks',
@@ -30,6 +31,7 @@ export class TasksComponent implements OnInit {
   private taskService = inject(TaskService);
   private authService = inject(AuthService);
   private taskDialog = inject(MatDialog);
+  private notificationService = inject(NotificationService);
 
   tasks = signal<Task[]>([]);
   filteredTasks = signal<Task[]>([]);
@@ -49,12 +51,23 @@ export class TasksComponent implements OnInit {
           : this.taskService.getUserTasks(profile.uid);
 
       task$.subscribe((tasks) => {
-        const processedTasks = tasks.map((task) => ({
-          ...task,
-          dueDate: convertTimestampToDate(task.dueDate),
-          createdAt: convertTimestampToDate(task.createdAt),
-          assignedTo: task.assignedTo,
-        }));
+        const processedTasks = tasks.map((task) => {
+          const dueDate = convertTimestampToDate(task.dueDate);
+          const createdAt = convertTimestampToDate(task.createdAt);
+        
+          // Overdue check logic here
+          const today = new Date();
+          if (dueDate && dueDate < today && task.status === 'pending') {
+            this.taskService.updateTask(task.id!, { status: 'overdue' });
+          }
+        
+          return {
+            ...task,
+            dueDate,
+            createdAt,
+            assignedTo: task.assignedTo,
+          };
+        });
         this.tasks.set(processedTasks);
         this.applyFilter();
       });
@@ -63,6 +76,7 @@ export class TasksComponent implements OnInit {
     this.authService.getAllUsers().subscribe((users) => {
       this.allUsers = users.filter((user) => user.role === 'member');
     });
+    
   }
 
   applyFilter() {
@@ -101,7 +115,7 @@ export class TasksComponent implements OnInit {
           assignedTo: formData.assignedTo,
         };
         this.taskService.createTask(task).then(() => {
-          console.log('Task created');
+          this.notificationService.success('Task created successfully');
         });
       }
     });
@@ -123,7 +137,7 @@ export class TasksComponent implements OnInit {
         };
 
         this.taskService.updateTask(task.id!, updatedTask).then(() => {
-          console.log('Task updated');
+          this.notificationService.success('Task updated successfully')
         });
       }
     });
@@ -134,8 +148,16 @@ export class TasksComponent implements OnInit {
     const confirmMessage = confirm('Are you sure you wan to delete this task?');
     if (confirmMessage) {
       this.taskService.deleteTask(taskId).then(() => {
-        console.log('Task deleted');
+        this.notificationService.success('Task deleted successfully');
       });
     }
+  }
+
+  markTaskAsCompleted(taskId: string) {
+    this.taskService.updateTask(taskId, {
+      status: 'completed'
+    }).then(() => {
+      this.notificationService.success('Task status changed successfully')
+    })
   }
 }

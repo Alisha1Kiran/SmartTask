@@ -45,7 +45,13 @@
       >Due: {{ task.dueDate | date : "shortDate" }}</mat-card-subtitle
     >
     <mat-card-content
-      >Status: {{ task.status }}<br />
+      ><span [ngClass]="{
+        'status-pending': task.status === 'pending',
+        'status-completed': task.status === 'completed',
+        'status-overdue': task.status === 'overdue'
+      }">
+       Status: {{ task.status }}
+      </span><br />
       Assigned to: {{ getAssigneeName(task.assignedTo) }}</mat-card-content
     >
 
@@ -60,6 +66,14 @@
         </button>
       </mat-card-actions>
     </mat-card-footer>
+    } @else if (userProfile()?.role === 'member' && task.status !== 'completed') {
+      <mat-card-footer>
+        <mat-card-actions>
+          <button mat-stroked-button color="primary" (click)="markTaskAsCompleted(task.id!)">
+            Mark as Completed
+          </button>
+        </mat-card-actions>
+      </mat-card-footer>
     }
   </mat-card>
   }

@@ -22,4 +22,15 @@
   .task-card {
     padding: 16px;
   }
+
+  .status-completed {
+    color: green;
+    font-weight: bold;
+  }
+  .status-pending {
+    color: orange;
+  }
+  .status-overdue {
+    color: red;
+  }
   
