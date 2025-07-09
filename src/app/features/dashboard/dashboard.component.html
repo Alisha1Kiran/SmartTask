@@ -31,7 +31,7 @@
         <mat-icon>menu</mat-icon>
       </button>
       }
-      <span class="welcome-text">Welcome {{ userProfile()?.name || 'User' }} 👋</span>
+      <span class="welcome-text">Welcome {{ userProfile()?.name || 'User' }} : {{userProfile()?.role || ''}} 👋</span>
       <span class="spacer"></span>
       <button mat-icon-button aria-label="Logout" (click)="logout()">
         <mat-icon>logout</mat-icon>
