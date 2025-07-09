@@ -28,7 +28,7 @@
   </mat-form-field>
 
   <div class="actions">
-    <button mat-flat-button color="primary" type="submit">Create</button>
+    <button mat-flat-button color="primary" type="submit">{{ isEditmode ? 'Update' : 'Create' }}</button>
     <button mat-stroked-button (click)="close()">Cancel</button>
   </div>
 </form>

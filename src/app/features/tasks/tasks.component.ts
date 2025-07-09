@@ -142,10 +142,20 @@ export class TasksComponent implements OnInit {
       if (formData) {
         const dueDateWithTime = new Date(formData.dueDate);
         dueDateWithTime.setHours(16, 0, 0, 0); // 4 PM
+
+        // Decide new status
+      let updatedStatus = formData.status;
+      const now = new Date();
+
+      if (updatedStatus === 'overdue' && dueDateWithTime > now) {
+        updatedStatus = 'pending';
+      }
+
         const updatedTask = {
           ...formData,
           dueDate: dueDateWithTime,
           assignedTo: formData.assignedTo,
+          status: updatedStatus
         };
 
         this.taskService.updateTask(task.id!, updatedTask).then(() => {
