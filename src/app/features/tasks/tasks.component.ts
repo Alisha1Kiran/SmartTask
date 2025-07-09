@@ -13,6 +13,7 @@ import { UserProfile } from '../../models/user.model';
 import { TaskFormComponent } from '../taskHelperComponents/taskform/taskform.component';
 import { convertTimestampToDate } from '../../utils/date-utils';
 import { NotificationService } from '../../services/notification/notification.service';
+import { ConfirmDialogComponent } from '../../shared/component/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-tasks',
@@ -167,12 +168,21 @@ export class TasksComponent implements OnInit {
 
   //Delete Task
   deleteTask(taskId: string) {
-    const confirmMessage = confirm('Are you sure you wan to delete this task?');
-    if (confirmMessage) {
-      this.taskService.deleteTask(taskId).then(() => {
-        this.notificationService.success('Task deleted successfully');
-      });
-    }
+    const dialogRef = this.taskDialog.open(ConfirmDialogComponent, {
+      width: '350px',
+      data: {
+        title: 'Delete Task',
+        message: 'Are you sure you want to delete this task?',
+      },
+    });
+  
+    dialogRef.afterClosed().subscribe((confirmed: boolean) => {
+      if (confirmed) {
+        this.taskService.deleteTask(taskId).then(() => {
+          this.notificationService.success('Task deleted successfully');
+        });
+      }
+    });
   }
 
   markTaskAsCompleted(taskId: string) {
