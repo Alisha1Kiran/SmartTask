@@ -1,25 +1,73 @@
-<h2>Login</h2>
-<form [formGroup]="loginForm" (ngSubmit)="onSubmit()" novalidate>
-    <div>
-        <label>Email</label>
-        <input type="email" formControlName="email" placeholder="Enter your email"/>
-        <!-- email error messages -->
-         <div *ngIf="loginForm.get('email')?.touched && loginForm.get('email')?.invalid" style="color: red;">
-            <small *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</small>
-            <small *ngIf="loginForm.get('email')?.errors?.['email']">Enter a valid email address</small>
-         </div>
-    </div>
+<div class="login-page">
+    <h2 class="login-title">Login</h2>
+  
+    <form
+      [formGroup]="loginForm"
+      (ngSubmit)="onSubmit()"
+      class="login-form"
+      novalidate
+    >
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Email</mat-label>
+        <input
+          matInput
+          type="email"
+          formControlName="email"
+          placeholder="Enter your email"
+        />
+        <button mat-icon-button matSuffix disabled>
+          <mat-icon fontIcon="email"></mat-icon>
+        </button>
+  
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.hasError('required')) {
+          <mat-error>Email is required.</mat-error>
+        }
+  
+        @if (loginForm.get('email')?.touched && loginForm.get('email')?.hasError('email')) {
+          <mat-error>Enter a valid email address.</mat-error>
+        }
+      </mat-form-field>
+  
+      <mat-form-field appearance="fill" class="full-width">
+        <mat-label>Password</mat-label>
+        <input
+          matInput
+          [type]="hidePassword ? 'password' : 'text'"
+          formControlName="password"
+          placeholder="Enter your password"
+        />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="togglePasswordVisibility()"
+          [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
+        >
+          <mat-icon>{{ hidePassword ? "visibility_off" : "visibility" }}</mat-icon>
+        </button>
+  
+        @if (loginForm.get('password')?.touched && loginForm.get('password')?.hasError('required')) {
+          <mat-error>Password is required.</mat-error>
+        }
+  
+        @if (loginForm.get('password')?.touched && loginForm.get('password')?.hasError('minlength')) {
+          <mat-error>Password must be at least 6 characters.</mat-error>
+        }
+      </mat-form-field>
 
-    <div>
-        <label>Password</label>
-        <input type="password" formControlName="password" placeholder="Enter password"/>
-
-        <!-- password erre -->
-         <div *ngIf="loginForm.get('password')?.touched && loginForm.get('password')?.invalid" style="color: red;">
-            <small *ngIf="loginForm.get('password')?.errors?.['required']">Password is required.</small>
-      <small *ngIf="loginForm.get('password')?.errors?.['minlength']">Password must be at least 6 characters.</small>
-         </div>
-    </div>
-
-    <button type="submit" [disabled]="loginForm.invalid">Submit</button>
-</form>
+      @if (errorMessage) {
+        <div class="error-message">{{ errorMessage }}</div>
+      }
+  
+      <button
+        mat-raised-button
+        color="primary"
+        class="full-width"
+        type="submit"
+        [disabled]="loginForm.invalid"
+      >
+        Login
+      </button>
+    </form>
+  </div>
+  

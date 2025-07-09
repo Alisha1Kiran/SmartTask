@@ -1,31 +1,36 @@
 <div class="task-toolbar">
   <div class="filter-group">
     <!-- Filter by status -->
-  <mat-form-field appearance="outline">
-    <mat-label>Status</mat-label>
-    <mat-select [(ngModel)]="selectedStatus" (selectionChange)="applyFilter()">
-      <mat-option value="all">All</mat-option>
-      <mat-option value="pending">Pending</mat-option>
-      <mat-option value="completed">Completed</mat-option>
-      <mat-option value="overdue">Overdue</mat-option>
-    </mat-select>
-  </mat-form-field>
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select
+        [(ngModel)]="selectedStatus"
+        (selectionChange)="applyFilter()"
+      >
+        <mat-option value="all">All</mat-option>
+        <mat-option value="pending">Pending</mat-option>
+        <mat-option value="completed">Completed</mat-option>
+        <mat-option value="overdue">Overdue</mat-option>
+      </mat-select>
+    </mat-form-field>
 
-  <mat-form-field appearance="outline">
-    <mat-label>Assignee</mat-label>
-    <mat-select
-      [(ngModel)]="selectedAssignee"
-      (selectionChange)="applyFilter()"
-    >
-      <mat-option value="all">All</mat-option>
-  
-      @for (user of allUsers; track user.uid) {
+    @if (userProfile()?.role === 'admin') {
+    <mat-form-field appearance="outline">
+      <mat-label>Assignee</mat-label>
+      <mat-select
+        [(ngModel)]="selectedAssignee"
+        (selectionChange)="applyFilter()"
+      >
+        <mat-option value="all">All</mat-option>
+
+        @for (user of allUsers; track user.uid) {
         <mat-option [value]="user.uid">
           {{ user.name || user.email }}
         </mat-option>
-      }
-    </mat-select>
-  </mat-form-field>
+        }
+      </mat-select>
+    </mat-form-field>
+    }
   </div>
 
   <!-- Add Task button -->
@@ -45,13 +50,15 @@
       >Due: {{ task.dueDate | date : "shortDate" }}</mat-card-subtitle
     >
     <mat-card-content
-      ><span [ngClass]="{
-        'status-pending': task.status === 'pending',
-        'status-completed': task.status === 'completed',
-        'status-overdue': task.status === 'overdue'
-      }">
-       Status: {{ task.status }}
-      </span><br />
+      ><span
+        [ngClass]="{
+          'status-pending': task.status === 'pending',
+          'status-completed': task.status === 'completed',
+          'status-overdue': task.status === 'overdue'
+        }"
+      >
+        Status: {{ task.status }} </span
+      ><br />
       Assigned to: {{ getAssigneeName(task.assignedTo) }}</mat-card-content
     >
 
@@ -66,14 +73,19 @@
         </button>
       </mat-card-actions>
     </mat-card-footer>
-    } @else if (userProfile()?.role === 'member' && task.status !== 'completed') {
-      <mat-card-footer>
-        <mat-card-actions>
-          <button mat-stroked-button color="primary" (click)="markTaskAsCompleted(task.id!)">
-            Mark as Completed
-          </button>
-        </mat-card-actions>
-      </mat-card-footer>
+    } @else if (userProfile()?.role === 'member' && task.status !== 'completed')
+    {
+    <mat-card-footer>
+      <mat-card-actions>
+        <button
+          mat-stroked-button
+          color="primary"
+          (click)="markTaskAsCompleted(task.id!)"
+        >
+          Mark as Completed
+        </button>
+      </mat-card-actions>
+    </mat-card-footer>
     }
   </mat-card>
   }

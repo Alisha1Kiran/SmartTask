@@ -1,14 +1,69 @@
+<p>
+  @if (userProfile()?.role === 'admin') {
+    You have access to view and manage all tasks.
+  } @else {
+    Here are your task updates for today.
+  }
+</p>
+
 <div class="dashboard-grid">
-  <mat-card class="summary-card">Pending: {{ pendingCount() }}</mat-card>
-  <mat-card class="summary-card">Completed: {{ completedCount() }}</mat-card>
-  <mat-card class="summary-card">Overdue: {{ overdueCount() }}</mat-card>
+  <mat-card class="summary-card pending">🕒 Pending: {{ pendingCount() }}</mat-card>
+  <mat-card class="summary-card completed">✅ Completed: {{ completedCount() }}</mat-card>
+  <mat-card class="summary-card overdue">⚠️ Overdue: {{ overdueCount() }}</mat-card>
 </div>
 
-<h3>Today's Tasks</h3>
-<mat-list>
-    @for (task of todaysTasks(); track task.id) {
-  <mat-list-item>
-    {{ task.title }} - {{ task.dueDate | date : "shortDate" }}
-  </mat-list-item>
+<mat-card class="progress-card section-card">
+  <h3>Task Progress</h3>
+  <p>{{ completedCount() }} of {{ totalTasks() }} tasks completed</p>
+  <mat-progress-bar mode="determinate" [value]="progressPercent()"></mat-progress-bar>
+</mat-card>
+
+@if (nextUpcomingTask()) {
+  <mat-card class="upcoming-task section-card">
+    <h3>Next Upcoming Task</h3>
+    <p>{{ nextUpcomingTask().title }}</p>
+    <p>Due: {{ nextUpcomingTask().dueDate | date: 'short' }}</p>
+  </mat-card>
 }
-</mat-list>
+
+@if (todaysTasks().length > 0) {
+  <mat-card class="todays-task section-card">
+    <h3>📅 Today's Tasks</h3>
+
+    <table mat-table [dataSource]="todaysTasks()" class="mat-elevation-z2 full-width-table">
+
+      <!-- Title Column -->
+      <ng-container matColumnDef="title">
+        <th mat-header-cell *matHeaderCellDef> Task </th>
+        <td mat-cell *matCellDef="let task"> {{ task.title }} </td>
+      </ng-container>
+
+      <!-- Due Time Column -->
+      <ng-container matColumnDef="dueDate">
+        <th mat-header-cell *matHeaderCellDef> Due Time </th>
+        <td mat-cell *matCellDef="let task"> {{ task.dueDate | date: 'shortTime' }} </td>
+      </ng-container>
+
+      <!-- Status Column -->
+      <ng-container matColumnDef="status">
+        <th mat-header-cell *matHeaderCellDef> Status </th>
+        <td mat-cell *matCellDef="let task">
+          <span [ngClass]="{
+            'status-pending': task.status === 'pending',
+            'status-completed': task.status === 'completed',
+            'status-overdue': task.status === 'overdue'
+          }">
+            {{ task.status }}
+          </span>
+        </td>
+      </ng-container>
+
+      <!-- Header & Row Declarations -->
+      <tr mat-header-row *matHeaderRowDef="['title', 'dueDate', 'status']"></tr>
+      <tr mat-row *matRowDef="let row; columns: ['title', 'dueDate', 'status'];"></tr>
+    </table>
+  </mat-card>
+} @else {
+  <p>No tasks for today 🎉</p>
+}
+

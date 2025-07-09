@@ -12,13 +12,16 @@ export class AuthService {
 
   user$ = authState(inject(Auth));
 
-  userProfile$: Observable<UserProfile | null> = this.user$.pipe(
+  userProfile$: Observable<(UserProfile & { uid: string }) | null> = this.user$.pipe(
     switchMap(user => {
       if (!user) return of(null);
       const userRef = doc(this.firestore, `users/${user.uid}`);
-      return docData(userRef) as Observable<UserProfile>;
+      return docData(userRef).pipe(
+        switchMap((profile) => of({ ...(profile as UserProfile), uid: user.uid }))
+      );
     })
   );
+  
 
   getAllUsers(): Observable<UserProfile[]> {
     const usersCollection = collection(this.firestore, 'users');

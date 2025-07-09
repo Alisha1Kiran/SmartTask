@@ -5,7 +5,7 @@
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" />
-      <button mat-icon-button matSuffix>
+      <button mat-icon-button matSuffix disabled>
         <mat-icon fontIcon="person"></mat-icon>
       </button>
       @if (signupForm.get('name')?.hasError('required')) {
@@ -16,7 +16,7 @@
     <mat-form-field appearance="fill" class="full-width">
       <mat-label>Email</mat-label>
       <input matInput formControlName="email" type="email" />
-      <button mat-icon-button matSuffix>
+      <button mat-icon-button matSuffix disabled>
         <mat-icon fontIcon="email"></mat-icon>
       </button>
       @if (signupForm.controls['email'].hasError('required')) {
@@ -30,17 +30,17 @@
       <mat-label>Enter your password</mat-label>
       <input
         matInput
-        [type]="hide() ? 'password' : 'text'"
+        [type]="hidePassword() ? 'password' : 'text'"
         formControlName="password"
       />
       <button
         mat-icon-button
         matSuffix
-        (click)="clickEvent($event)"
+        (click)="clickPasswordToggle($event)"
         [attr.aria-label]="'Hide password'"
-        [attr.aria-pressed]="hide()"
+        [attr.aria-pressed]="hidePassword()"
       >
-        <mat-icon>{{ hide() ? "visibility_off" : "visibility" }}</mat-icon>
+        <mat-icon>{{ hidePassword() ? "visibility_off" : "visibility" }}</mat-icon>
       </button>
       @if (signupForm.controls['password'].hasError('required')) {
       <mat-error> Password is required </mat-error>
@@ -54,23 +54,23 @@
       <mat-label>Confirm Password</mat-label>
       <input
         matInput
-        [type]="hide() ? 'password' : 'text'"
+        [type]="hideConfirmPassword() ? 'password' : 'text'"
         formControlName="confirmPassword"
       />
       <button
         mat-icon-button
         matSuffix
-        (click)="clickEvent($event)"
+        (click)="clickConfirmPasswordToggle($event)"
         [attr.aria-label]="'Hide password'"
-        [attr.aria-pressed]="hide()"
+        [attr.aria-pressed]="hideConfirmPassword()"
       >
-        <mat-icon>{{ hide() ? "visibility_off" : "visibility" }}</mat-icon>
+        <mat-icon>{{ hideConfirmPassword() ? "visibility_off" : "visibility" }}</mat-icon>
       </button>
       @if (signupForm.get('confirmPassword')?.hasError('required')) {
       <mat-error> Confirm your password </mat-error>
-      } @else if (signupForm.getError('passwordsMismatch') &&
-      signupForm.get('confirmPassword')?.touched) {
-      <mat-error> Passwords do not match </mat-error>
+      } 
+      @if (signupForm.get('confirmPassword')?.hasError('passwordMismatch') && signupForm.get('confirmPassword')?.dirty) {
+        <mat-error> Passwords do not match </mat-error>
       }
     </mat-form-field>
 

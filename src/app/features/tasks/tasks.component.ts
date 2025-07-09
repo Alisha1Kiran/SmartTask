@@ -45,6 +45,15 @@ export class TasksComponent implements OnInit {
       this.userProfile.set(profile);
       if (!profile) return;
 
+      // Populate users differently for admin/member
+      if (profile.role === 'admin') {
+        this.authService.getAllUsers().subscribe((users) => {
+          this.allUsers = users.filter((user) => user.role === 'member');
+        });
+      } else {
+        this.allUsers = [profile]; // only self for member
+      }
+
       const task$ =
         profile.role === 'admin'
           ? this.taskService.getAllTasks()
@@ -54,13 +63,13 @@ export class TasksComponent implements OnInit {
         const processedTasks = tasks.map((task) => {
           const dueDate = convertTimestampToDate(task.dueDate);
           const createdAt = convertTimestampToDate(task.createdAt);
-        
+
           // Overdue check logic here
           const today = new Date();
           if (dueDate && dueDate < today && task.status === 'pending') {
             this.taskService.updateTask(task.id!, { status: 'overdue' });
           }
-        
+
           return {
             ...task,
             dueDate,
@@ -73,10 +82,9 @@ export class TasksComponent implements OnInit {
       });
     });
 
-    this.authService.getAllUsers().subscribe((users) => {
-      this.allUsers = users.filter((user) => user.role === 'member');
-    });
-    
+    // this.authService.getAllUsers().subscribe((users) => {
+    //   this.allUsers = users.filter((user) => user.role === 'member');
+    // });
   }
 
   applyFilter() {
@@ -97,7 +105,7 @@ export class TasksComponent implements OnInit {
   }
 
   getAssigneeName(uid: string): string {
-    const user = this.allUsers.find(u => u.uid === uid);
+    const user = this.allUsers.find((u) => u.uid === uid);
     return user?.name || user?.email || 'Unknown';
   }
 
@@ -108,9 +116,11 @@ export class TasksComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((formData) => {
       if (formData) {
+        const dueDateWithTime = new Date(formData.dueDate);
+        dueDateWithTime.setHours(16, 0, 0, 0); // 4 PM
         const task = {
           ...formData,
-          dueDate: new Date(formData.dueDate),
+          dueDate: dueDateWithTime,
           createdAt: new Date(),
           assignedTo: formData.assignedTo,
         };
@@ -130,14 +140,16 @@ export class TasksComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((formData) => {
       if (formData) {
+        const dueDateWithTime = new Date(formData.dueDate);
+        dueDateWithTime.setHours(16, 0, 0, 0); // 4 PM
         const updatedTask = {
-          ...FormData,
-          dueDate: new Date(formData.dueDate),
+          ...formData,
+          dueDate: dueDateWithTime,
           assignedTo: formData.assignedTo,
         };
 
         this.taskService.updateTask(task.id!, updatedTask).then(() => {
-          this.notificationService.success('Task updated successfully')
+          this.notificationService.success('Task updated successfully');
         });
       }
     });
@@ -154,10 +166,12 @@ export class TasksComponent implements OnInit {
   }
 
   markTaskAsCompleted(taskId: string) {
-    this.taskService.updateTask(taskId, {
-      status: 'completed'
-    }).then(() => {
-      this.notificationService.success('Task status changed successfully')
-    })
+    this.taskService
+      .updateTask(taskId, {
+        status: 'completed',
+      })
+      .then(() => {
+        this.notificationService.success('Task status changed successfully');
+      });
   }
 }

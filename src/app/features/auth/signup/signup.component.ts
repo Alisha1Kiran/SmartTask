@@ -49,9 +49,16 @@ export class SignupComponent implements OnInit {
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
 
-  hide = signal(true);
-  clickEvent(event: MouseEvent) {
-    this.hide.set(!this.hide());
+  hidePassword = signal(true);
+  hideConfirmPassword = signal(true);
+
+  clickPasswordToggle(event: MouseEvent) {
+    this.hidePassword.set(!this.hidePassword());
+    event.stopPropagation();
+  }
+  
+  clickConfirmPasswordToggle(event: MouseEvent) {
+    this.hideConfirmPassword.set(!this.hideConfirmPassword());
     event.stopPropagation();
   }
 
@@ -62,33 +69,51 @@ export class SignupComponent implements OnInit {
       password: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]],
     },
-    { validators: this.passwordsMatchValidator }
+    { validators: this.passwordsMatchValidator.bind(this) }
   );
 
   ngOnInit() {
     this.signupForm.valueChanges.subscribe(() => {
-      this.signupForm.updateValueAndValidity({
-        onlySelf: true,
-        emitEvent: false,
-      });
+      this.signupForm.updateValueAndValidity({ onlySelf: false, emitEvent: false });
       this.cdr.markForCheck();
     });
   }
 
-  private passwordsMatchValidator(
-    group: AbstractControl
-  ): ValidationErrors | null {
-    const password = group.get('password')?.value;
-    const confirmPassword = group.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { passwordsMismatch: true };
+  private passwordsMatchValidator(group: AbstractControl): void {
+    const passwordControl = group.get('password');
+    const confirmPasswordControl = group.get('confirmPassword');
+  
+    if (!passwordControl || !confirmPasswordControl) return;
+  
+    const password = passwordControl.value;
+    const confirmPassword = confirmPasswordControl.value;
+  
+    if (password !== confirmPassword) {
+      confirmPasswordControl.setErrors({ passwordMismatch: true });
+    } else {
+      // Clear only the passwordMismatch error
+      const errors = confirmPasswordControl.errors;
+      if (errors) {
+        delete errors['passwordMismatch'];
+        if (Object.keys(errors).length === 0) {
+          confirmPasswordControl.setErrors(null);
+        } else {
+          confirmPasswordControl.setErrors(errors);
+        }
+      }
+    }
   }
+  
 
   loading = false;
   error: string | null = null;
 
   async onSubmit() {
     this.error = null;
-    if (this.signupForm.invalid) return;
+    if (this.signupForm.invalid) {
+      this.signupForm.markAllAsTouched(); // Add this line
+      return;
+    }
 
     this.loading = true;
 

@@ -1,0 +1,15 @@
+<div class="auth-container">
+  <div class="toggle-button">
+    <button mat-button color="primary" (click)="toggleForm()">
+      {{ showLogin() ? "Go to Signup" : "Go to Login" }}
+    </button>
+  </div>
+
+  <div class="form-wrapper" [@fadeAnimation]="showLogin() ? 'login' : 'signup'">
+    @if (showLogin()) {
+    <app-login></app-login>
+    } @else {
+    <app-signup></app-signup>
+    }
+  </div>
+</div>

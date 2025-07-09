@@ -17,10 +17,10 @@
         <span class="nav-label">My Tasks</span>
       </a>
 
-      <a mat-list-item routerLink="/team" routerLinkActive="active">
+      <!-- <a mat-list-item routerLink="/team" routerLinkActive="active">
         <mat-icon>group</mat-icon>
         <span class="nav-label">Team</span>
-      </a>
+      </a> -->
     </mat-nav-list>
   </mat-sidenav>
 
@@ -31,7 +31,7 @@
         <mat-icon>menu</mat-icon>
       </button>
       }
-      <span class="welcome-text">Welcome, {{ userName || "User" }}</span>
+      <span class="welcome-text">Welcome {{ userProfile()?.name || 'User' }} 👋</span>
       <span class="spacer"></span>
       <button mat-icon-button aria-label="Logout" (click)="logout()">
         <mat-icon>logout</mat-icon>
